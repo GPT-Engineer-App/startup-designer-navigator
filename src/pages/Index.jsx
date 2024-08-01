@@ -5,13 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink, Linkedin } from "lucide-react";
 
-const startups = [
-  { id: 1, name: "TechNova", teamSize: 15, location: "San Francisco", website: "https://technova.com", linkedin: "https://linkedin.com/company/technova" },
-  { id: 2, name: "GreenEco", teamSize: 8, location: "New York", website: "https://greeneco.com", linkedin: "https://linkedin.com/company/greeneco" },
-  { id: 3, name: "AIVision", teamSize: 25, location: "London", website: "https://aivision.com", linkedin: "https://linkedin.com/company/aivision" },
-  { id: 4, name: "CloudScale", teamSize: 12, location: "Berlin", website: "https://cloudscale.com", linkedin: "https://linkedin.com/company/cloudscale" },
-  { id: 5, name: "BioTech", teamSize: 20, location: "Boston", website: "https://biotech.com", linkedin: "https://linkedin.com/company/biotech" },
-];
+const generateStartups = (count) => {
+  const locations = ["San Francisco", "New York", "London", "Berlin", "Boston", "Tokyo", "Singapore", "Paris", "Toronto", "Sydney"];
+  const industries = ["Tech", "Green", "AI", "Cloud", "Biotech", "Fintech", "EdTech", "HealthTech", "AgriTech", "SpaceTech"];
+  
+  return Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
+    name: `${industries[Math.floor(Math.random() * industries.length)]}${Math.floor(Math.random() * 1000)}`,
+    teamSize: Math.floor(Math.random() * 100) + 1,
+    location: locations[Math.floor(Math.random() * locations.length)],
+    website: `https://${industries[Math.floor(Math.random() * industries.length)].toLowerCase()}${Math.floor(Math.random() * 1000)}.com`,
+    linkedin: `https://linkedin.com/company/${industries[Math.floor(Math.random() * industries.length)].toLowerCase()}${Math.floor(Math.random() * 1000)}`,
+  }));
+};
+
+const startups = generateStartups(50);
 
 const Index = () => {
   const [filteredStartups, setFilteredStartups] = useState(startups);
@@ -19,20 +27,18 @@ const Index = () => {
   const [locationFilter, setLocationFilter] = useState("");
 
   const handleFilter = () => {
-    let filtered = startups;
-    if (teamSizeFilter) {
-      filtered = filtered.filter(startup => {
-        if (teamSizeFilter === "small") return startup.teamSize <= 10;
-        if (teamSizeFilter === "medium") return startup.teamSize > 10 && startup.teamSize <= 50;
-        if (teamSizeFilter === "large") return startup.teamSize > 50;
-        return true;
-      });
-    }
-    if (locationFilter) {
-      filtered = filtered.filter(startup => 
-        startup.location.toLowerCase().includes(locationFilter.toLowerCase())
-      );
-    }
+    const filtered = startups.filter(startup => {
+      const teamSizeMatch = !teamSizeFilter || 
+        (teamSizeFilter === "small" && startup.teamSize <= 10) ||
+        (teamSizeFilter === "medium" && startup.teamSize > 10 && startup.teamSize <= 50) ||
+        (teamSizeFilter === "large" && startup.teamSize > 50);
+      
+      const locationMatch = !locationFilter || 
+        startup.location.toLowerCase().includes(locationFilter.toLowerCase());
+      
+      return teamSizeMatch && locationMatch;
+    });
+    
     setFilteredStartups(filtered);
   };
 
@@ -62,7 +68,7 @@ const Index = () => {
         <Button onClick={handleFilter}>Filter</Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {filteredStartups.map(startup => (
           <Card key={startup.id}>
             <CardHeader>
